@@ -27,6 +27,7 @@ public:
 };
 
 priority_queue<edge, vector<edge>, compare> q; //compare라는 functor 
+priority_queue<edge, vector<edge>, compare> child; //compare라는 functor 
 int* parent_node;
 int N, M;
 vector<list<pair<int, int>>> graph; // <node, cost>
@@ -70,26 +71,44 @@ int prim(void) {
 		cost += top.cost;
 		
 		list<pair<int, int>>::iterator iter = graph[top.node[0]].begin();
+		list<pair<int, int>>::iterator min = iter;
 		while (iter != graph[top.node[0]].end()) {
 			cout << "debug 1" << endl;
-
+			child.push(edge({ iter->second, {top.node[0], iter->first} })); // cost node0 node1
+			/*
 			pair<int, int> elem = *iter; // <node, cost>
 			if (Find(elem.first) != Find(top.node[0])) {
 				q.push(edge({ elem.second, {top.node[0], elem.first} }));
 			}
+			*/
 			++iter;
+
 		}
 
 		iter = graph[top.node[1]].begin();
 		while (iter != graph[top.node[1]].end()) {
 			cout << "debug 2" << endl;
-
+			child.push(edge({ iter->second, {top.node[1], iter->first} })); // cost node0 node1
+			/*
 			pair<int, int> elem = *iter; // <node, cost>
 			if (Find(elem.first) != Find(top.node[1])) {
 				q.push(edge({ elem.second, {top.node[1], elem.first} }));
 			}
+			*/
 			++iter;
 		}
+		pair<int, int> elem = *min;
+		while (!child.empty()) {
+			edge top = child.top();
+			child.pop();
+			if (Find(top.node[0]) != Find(top.node[1])) {
+				q.push(top);
+				Union(top.node[0], top.node[1]);
+				cost += top.cost;
+				break;
+			}
+		}
+		
 	}
 	return cost;
 }
